@@ -81,7 +81,47 @@ end
 
 ```
 SidekiqUtils::Deprioritize.workers(SolrIndexWorker) do
-  # code that enqueues lots of SolrIndexWorker that will now
-  # all end up on the `low` queue
+  10_000.times do
+    # these will all go to the `low` queue
+    SolrIndexWorker.perform_async(User, rand(10_000))
+  end
+end
+```
+
+## Enqueued jobs helper
+
+A simple tool to inspect and manipulate Sidekiq queues from the console:
+
+```
+> SidekiqUtils::EnqueuedJobsHelper.counts
+=> {"default"=>{}, "high"=>{"AlgoliaIndexWorker[JobProfile]"=>1}, "low"=>{"AlgoliaIndexWorker[JobProfile]"=>1}}
+
+> SidekiqUtils::EnqueuedJobsHelper.delete(queue: 'low', job_class: 'AlgoliaIndexWorker', first_argument: JobProfile)
+# first_argument is optional
+```
+
+## Find optional
+
+Lots of jobs become moot when a record cannot be found; however, because Sidekiq is very fast and it's easy to forget to enqueue jobs in `after_commit` hooks, sometimes the record isn't found simply because the transaction in which it was inserted has not been committed yet. This will retry a `find_optional` call exactly once after 30 seconds if the record cannot be found.
+
+### Configuration
+
+```
+Sidekiq.configure_server do |config|
+  config.server_middleware do |chain|
+    chain.add SidekiqUtils::Middleware::Server::FindOptional
+  end
+end
+```
+
+### Usage
+
+```
+class SolrIndexWorker
+  include Sidekiq::Worker
+  
+  def perform(user_id)
+    user = find_optional(User, user_id)
+  end
 end
 ```
