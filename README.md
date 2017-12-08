@@ -140,6 +140,46 @@ Sidekiq::Web.tabs["Job counts"] = "job_counts"
 
 ### Usage
 
-This will add a "Job counts" tab to your Sidekiq admin which will deploy the current job count.
+This will add a "Job counts" tab to your Sidekiq admin which will display the current job count.
 
 Please note that the accuracy of these numbers is not guaranteed as it is non-trivial to keep a running count. However, this is a useful tool when you are inspecting a very long queue.
+
+## Memory monitor
+
+This automatically checks memory usage before and after a worker is run and keeps track of which jobs consistently leak memory. Please note that this is very approximate. It also requires you running one worker process single-threaded with `-c 1`. It slows down jobs processed by that worker considerably.
+
+### Configuration
+
+```
+Sidekiq.configure_server do |config|
+  config.server_middleware do |chain|
+    chain.add SidekiqUtils::Middleware::Server::MemoryMonitor
+  end
+end
+Sidekiq::Web.register SidekiqUtils::WebExtensions::MemoryMonitor
+Sidekiq::Web.tabs["Memory"] = "memory"
+```
+
+### Usage
+
+This will add a "Memory" tab to your Sidekiq admin which will display memory usage information.
+
+## Throughput monitor
+
+This will keep track of how many jobs of which worker class have run in the past week, as well as when it was last run.
+
+### Configuration
+
+```
+Sidekiq.configure_server do |config|
+  config.server_middleware do |chain|
+    chain.add SidekiqUtils::Middleware::Server::ThroughputMonitor
+  end
+end
+Sidekiq::Web.register SidekiqUtils::WebExtensions::ThroughputMonitor
+Sidekiq::Web.tabs["Throughput"] = "throughput"
+```
+
+### Usage
+
+This will add a "Throughput" tab to your Sidekiq admin which will display job throughput information.
