@@ -64,10 +64,21 @@ module SidekiqUtils
       end
 
       def slack_alert(alert_message)
-        Array.wrap(config['channels_to_alert']).each do |slack_name|
-          Slack.send_message(
-            slack_name, alert_message,
-            icon: ':alarm_clock:', username: 'Sidekiq alerts')
+        return unless config['slack'].present?
+        require 'slack-notifier'
+        @slack ||= Slack::Notifier.new(
+          "https://#{config['slack']['team']}.slack.com/services/hooks/incoming-webhook?"\
+            "token=#{config['slack']['token']}",
+          username: config['slack']['username'] || 'Sidekiq alerts',
+          icon_emoji: ":#{config['slack']['icon'] || 'alarm_clock'}:")
+
+        if defined?(Rails) && !Rails.env.production?
+          channels = ['#test-channel']
+        else
+          channels = config['slack']['channels_to_alert']
+        end
+        Array.wrap(channels).each do |slack_name|
+          @slack.ping(alert_message, channel: slack_name)
         end
       end
 
