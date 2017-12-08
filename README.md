@@ -125,3 +125,21 @@ class SolrIndexWorker
   end
 end
 ```
+
+## Job counter
+
+This will keep a running count of jobs per queue and worker class so that you can inspect what is clogging up high-volume queues without having to iterate over the entire queue.
+
+### Configuration
+
+```
+SidekiqUtils::JobCounter.hook_sidekiq!
+Sidekiq::Web.register SidekiqUtils::WebExtensions::JobCounter
+Sidekiq::Web.tabs["Job counts"] = "job_counts"
+```
+
+### Usage
+
+This will add a "Job counts" tab to your Sidekiq admin which will deploy the current job count.
+
+Please note that the accuracy of these numbers is not guaranteed as it is non-trivial to keep a running count. However, this is a useful tool when you are inspecting a very long queue.
