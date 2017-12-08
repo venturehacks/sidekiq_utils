@@ -8,9 +8,11 @@ module SidekiqUtils
       def check!
         alerts = {}
         Sidekiq::Queue.all.each do |queue|
-          threshold = config['alert_thresholds'][queue.name]
+          threshold = config['alert_thresholds'][queue.name].
+            try!(&:to_i).try!(:minutes)
           next if threshold == :disabled
-          threshold ||= config['alert_thresholds']['default'] || 10.minutes
+          threshold ||= config['alert_thresholds']['default'].
+            try!(&:to_i).try!(:minutes) || 10.minutes
           if (latency = queue.latency) > threshold
             alerts[queue.name] = latency
           end
