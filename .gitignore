@@ -1,0 +1,6 @@
+# allow each developer to set this locally
+.ruby-version
+# bundler
+.bundle
+# juwelier generated
+pkg 

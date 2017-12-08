@@ -1,0 +1,33 @@
+<header class='row'>
+  <div class='col-sm-5'>
+    <h3>Memory</h3>
+  </div>
+</header>
+
+<p>
+Data from the trailing seven days. Only a small percentage of jobs get
+profiled. The "absolute" numbers refer only to those jobs that did get
+profiled.
+</p>
+<table class='table table-striped table-bordered table-white'>
+  <thead>
+    <tr>
+      <th>Job</th>
+      <th>Memory growth (absolute)</th>
+      <th>Memory growth (per job)</th>
+      <th>Object growth (absolute)</th>
+      <th>Object growth (per job)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @memory.each do |(job, avg_memory, avg_object, abs_memory, abs_object)| %>
+      <tr>
+        <td><%= job %></td>
+        <td><%= ActiveSupport::NumberHelper.number_to_human_size(abs_memory) %></td>
+        <td><%= ActiveSupport::NumberHelper.number_to_human_size(avg_memory) %></td>
+        <td><%= ActiveSupport::NumberHelper.number_to_delimited(abs_object) %></td>
+        <td><%= ActiveSupport::NumberHelper.number_to_delimited(avg_object) %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table
