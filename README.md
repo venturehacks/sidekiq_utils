@@ -144,6 +144,33 @@ This will add a "Job counts" tab to your Sidekiq admin which will display the cu
 
 Please note that the accuracy of these numbers is not guaranteed as it is non-trivial to keep a running count. However, this is a useful tool when you are inspecting a very long queue.
 
+## Latency monitor
+
+This will monitor queue latency and report to Slack channels if the latency exceeds the configured threshold.
+
+### Configuration
+
+Create a `config/sidekiq_utils.yml` file in your project:
+```
+repeat_alert_every: 60 # repeat identical alerts every x minutes
+alert_thresholds: # in minutes
+  default: 10
+  high: 5
+  low: 60
+slack:
+  username: 'Sidekiq alerts'
+  icon: 'alarm_clock'
+  team: 'foobar'
+  token: 'xxx'
+  channels_to_alert:
+    - "#ops-alerts"
+    - "#sidekiq-alerts"
+```
+
+### Usage
+
+Simply call `SidekiqUtils::LatencyAlert.check!` at regular intervals.
+
 ## Memory monitor
 
 This automatically checks memory usage before and after a worker is run and keeps track of which jobs consistently leak memory. Please note that this is very approximate. It also requires you running one worker process single-threaded with `-c 1`. It slows down jobs processed by that worker considerably.
