@@ -1,8 +1,10 @@
+require 'sidekiq_utils/redis_monitor_storage'
+
 module SidekiqUtils
   module JobCounter
     REDIS_KEY = 'sidekiq_utils_job_counter'
     LOCK = Mutex.new
-    SYNC_COUNTS_EVERY = 1.second
+    SYNC_COUNTS_EVERY = 1 # second
 
     class << self
       def increment(job)
@@ -59,7 +61,7 @@ module SidekiqUtils
           @counts_to_flush[hash_key] ||= 0
           @counts_to_flush[hash_key] += change_by
 
-          if !Rails.env.test?
+          if ENV['RAILS_ENV'] == 'test'
             @sync_thread ||= Thread.new do
               sleep SYNC_COUNTS_EVERY
               sync_to_redis
@@ -67,7 +69,7 @@ module SidekiqUtils
           end
         end
 
-        sync_to_redis if Rails.env.test?
+        sync_to_redis if ENV['RAILS_ENV'] == 'test'
       end
 
       def sync_to_redis
