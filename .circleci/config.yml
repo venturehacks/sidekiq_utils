@@ -8,7 +8,7 @@ jobs:
     docker:
       # specify the version you desire here
        - image: circleci/ruby:2.2
-       - image: easymetrics/circleci-redis:latest
+       - image: redis:latest
       
     working_directory: ~/sidekiq_utils
 
