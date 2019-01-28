@@ -3,10 +3,8 @@ require 'sidekiq_utils/middleware/client/deprioritize'
 
 require 'sidekiq_utils/middleware/server/additional_serialization'
 require 'sidekiq_utils/middleware/server/find_optional'
-require 'sidekiq_utils/middleware/server/memory_monitor'
 require 'sidekiq_utils/middleware/server/throughput_monitor'
 
-require 'sidekiq_utils/web_extensions/memory_monitor'
 require 'sidekiq_utils/web_extensions/throughput_monitor'
 
 require 'sidekiq_utils/redis_monitor_storage'
