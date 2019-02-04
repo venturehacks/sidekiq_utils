@@ -3,4 +3,6 @@
 # bundler
 .bundle
 # juwelier generated
-pkg 
+pkg
+# this is just a gem, no need to lock gem dependencies
+Gemfile.lock
