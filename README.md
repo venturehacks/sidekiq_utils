@@ -145,7 +145,7 @@ slack:
   team: 'foobar'
   token: 'xxx'
   channels_to_alert:
-    - "#ops-alerts"
+    - "#devops-alerts"
     - "#sidekiq-alerts"
 ```
 
